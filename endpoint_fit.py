@@ -105,7 +105,15 @@ fixed.
     
     def cost2(pars):
         print "Second Endpoint Pars:", pars
-        return data - mod2(pars)
+        x_max = pars[0]
+        y_max = pars[1]
+        endpoint_cost = np.zeros(2)
+        if x_max > 1.0:
+            endpoint_cost[0] = x_max - 1.0
+        if y_max > 1.0:
+            endpoint_cost[0] = y_max - 1.0
+        return np.append(endpoint_cost, data - mod2(pars))
+#        return data - mod2(pars)
 
     v_guess1 = [0.0, 0.0] # x1, y1
     v1,suc1 = leastsq(cost1, v_guess1, ftol=1e-12, xtol=1e-12, maxfev = 5000)
