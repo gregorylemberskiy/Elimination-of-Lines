@@ -6,7 +6,7 @@ from scipy.optimize import leastsq
 from scipy.ndimage import binary_closing, grey_closing
 
 
-def LineModel(pt1, pt2, Nx=100, Ny=100, h=1.0, sig=0.1):
+def LineModel(pt1, pt2, Nx=100, Ny=100, h=1.0, sig=0.025):
     """
 Generates an image (2d numpy array) of a smeared out line connecting two
 points.
@@ -95,18 +95,32 @@ fixed.
     h, sig = 1.0, 0.025
     v_real = [0.2, 0.2, 0.8, 0.4] # x1, y1, x2, y2
 
-    mod = lambda v: LineModel([v[0], v[1]], [v[2], v[3]], h=h, sig=sig).flatten()
-    data = mod(v_real).flatten()
+    data = LineModel([v_real[0], v_real[1]], [v_real[2], v_real[3]], h=h, sig=sig).flatten()
 
-    def cost(pars):
-        print "called with pars", pars
-        return data - mod(pars)
+    mod1 = lambda v: LineModel([v[0], v[1]], [v_real[2], v_real[3]]).flatten()
 
-    v_guess = [0.15, 0.25, 0.8, 0.4] # x1, y1, x2, y2
-    v, success = leastsq(cost, v_guess, ftol=1e-12, xtol=1e-12, maxfev=1000)
-    model = mod(v)
+    def cost1(pars):
+        print "First Endpoint Pars:", pars
+        return data - mod1(pars)
+    
+    def cost2(pars):
+        print "Second Endpoint Pars:", pars
+        return data - mod2(pars)
 
-    print "success:", success
+    v_guess1 = [0.0, 0.0] # x1, y1
+    v1,suc1 = leastsq(cost1, v_guess1, ftol=1e-12, xtol=1e-12, maxfev = 5000)
+#    model1 = mod(v1)
+
+    vg2 = [1.0, 1.0]
+    mod2 = lambda v: LineModel([v1[0], v1[1]], [v[0],v[1]]).flatten()
+
+    v2,suc2 = leastsq(cost2, vg2, ftol=1e-12, xtol=1e-12, maxfev = 5000)
+    model = mod2(v2)
+    print "--------------------------------------------"
+    print "--First  Endpoint:",v1
+    print "--Second Endpoint:",v2
+
+#    print "success:", success
 
     fig = plt.figure()
     ax1 = fig.add_subplot('121')
@@ -138,4 +152,4 @@ This doesn't really work ;(
 
 
 if __name__ == "__main__":
-    FitLine_test1()
+    FitLine_test2()
