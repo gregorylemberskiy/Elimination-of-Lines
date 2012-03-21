@@ -28,15 +28,8 @@ different resolutions Nx, Ny.
     m = (y2 - y1) / (x2 - x1)
 
     X, Y = np.mgrid[0:1:Nx*1j,0:1:Ny*1j]
-
-    # --------------------------------------------------------------------------
-    # Perpendicular distance to the line from a point:
-    #
-    # http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html
-    #
-    # --------------------------------------------------------------------------
+  
     d = abs((x2-x1)*(y1-Y) - (y2-y1)*(x1-X)) / np.sqrt((x2-x1)**2 + (y2-y1)**2)
-
     A = h / np.sqrt(2*np.pi*sig**2) * np.exp(-d**2 / (2*sig**2))
     A[y1 - (X-x1)/m > Y] = 0.0
     A[y2 - (X-x2)/m < Y] = 0.0
@@ -91,65 +84,64 @@ fixed.
 
 *** Presently, this test fails miserably ***
 """
-
+    
     h, sig = 1.0, 0.025
     v_real = [0.2, 0.2, 0.8, 0.4] # x1, y1, x2, y2
-
+    
     data = LineModel([v_real[0], v_real[1]], [v_real[2], v_real[3]], h=h, sig=sig).flatten()
-
+    
     mod1 = lambda v: LineModel([v[0], v[1]], [v_real[2], v_real[3]]).flatten()
-
+    
     def cost1(pars):
         print "First Endpoint Pars:", pars
         return data - mod1(pars)
     
-    def cost2(pars):
+    def cost2(pars,optpar):
         print "Second Endpoint Pars:", pars
-        x_max = pars[0]
-        y_max = pars[1]
-        endpoint_cost = np.zeros(2)
-        if x_max > 1.0:
-            endpoint_cost[0] = x_max - 1.0
-        if y_max > 1.0:
-            endpoint_cost[0] = y_max - 1.0
+        x1, y1 = optpar
+        x2 = pars[0]
+        endpoint_cost = 0.0
+        if x2 > 1.0:
+            #endpoint_cost[0] = x_max - 1.0
+            endpoint_cost = x2-x1
         return np.append(endpoint_cost, data - mod2(pars))
-#        return data - mod2(pars)
-
+    
+    
     v_guess1 = [0.0, 0.0] # x1, y1
     v1,suc1 = leastsq(cost1, v_guess1, ftol=1e-12, xtol=1e-12, maxfev = 5000)
-#    model1 = mod(v1)
-
+# model1 = mod(v1)
+    
     vg2 = [1.0, 1.0]
     mod2 = lambda v: LineModel([v1[0], v1[1]], [v[0],v[1]]).flatten()
-
-    v2,suc2 = leastsq(cost2, vg2, ftol=1e-12, xtol=1e-12, maxfev = 5000)
+    
+    v2,suc2 = leastsq(cost2, vg2, args = (v1),ftol=1e-12, xtol=1e-12, maxfev = 5000)
     model = mod2(v2)
     print "--------------------------------------------"
-    print "--First  Endpoint:",v1
+    print "--First Endpoint:",v1
     print "--Second Endpoint:",v2
 
-#    print "success:", success
+# print "success:", success
 
     fig = plt.figure()
     ax1 = fig.add_subplot('121')
     ax2 = fig.add_subplot('122')
-
+    
     ax1.imshow(data .reshape(100,100).T, origin='image', interpolation='nearest')
     ax2.imshow(model.reshape(100,100).T, origin='image', interpolation='nearest')
-
+    
     ax1.set_title('data')
     ax2.set_title('model')
-
+    
     plt.show()
-
-
+    
+    
 def Closing_test():
     """
 This doesn't really work ;(
 """
     model = 1.0 - LineModel([0.2, 0.2], [0.8, 0.4], h=1.0, sig=0.0025)
     close = grey_closing(model, size=(4,4))
-
+    
     fig = plt.figure()
     ax1 = fig.add_subplot('121')
     ax2 = fig.add_subplot('122')
@@ -157,7 +149,6 @@ This doesn't really work ;(
     ax1.imshow(model.T, origin='image', interpolation='nearest')
     ax2.imshow(close.T, origin='image', interpolation='nearest')
     plt.show()
-
 
 if __name__ == "__main__":
     FitLine_test2()
