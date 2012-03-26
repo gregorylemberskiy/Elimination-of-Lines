@@ -147,7 +147,7 @@ def FitLine_test2():
         print "called with pars", pars
         return abs(data - mod(pars)).sum()
 
-    v_guess = [v_real[0] + 0.2, v_real[1] - 0.2]
+    v_guess = [0.5, 0.5]
     v = fmin(cost, v_guess, ftol=1e-8)
     model = mod(v)
 
