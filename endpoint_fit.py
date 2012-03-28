@@ -76,9 +76,9 @@ def FitLine_test0():
 
 def FitLine_test1():
     """
-Tests a line-model fit over the intensity and width using
-scipy.leastsq. Endpoints are left fixed.
-"""
+    Tests a line-model fit over the intensity and width using
+    scipy.leastsq. Endpoints are left fixed.
+    """
 
     pt1, pt2 = [0.2, 0.2], [0.8, 0.4]
     v_real = [1.0, 0.025] # h, sig
@@ -109,73 +109,44 @@ scipy.leastsq. Endpoints are left fixed.
 
 def FitLine_test2():
     """
-Tests a line-model fit over the line endpoints using the scipy.fmin
-routine. Intensity and width are kept fixed.
-"""
-#    Nx = 200
-#    Ny = 200
+    Tests a line-model fit over the line endpoints using the scipy.leastsq
+    routine. Intensity and width are kept fixed.
+    """
     Nx, Ny = [200,200]
 
     pt1, pt2 = [0.2, 0.2], [0.8, 0.4]
-    v_real = [0.2, 0.8] # h, sig
+    v_real = [pt1[0], pt2[0]]
     h = 1.0
     sig = 0.025
 
-    mod = lambda v: LineModel([v[0],pt1[1]], [v[1],pt2[1]], h=h, sig=sig)#.flatten()
-    data = mod(v_real)#.flatten()
+    mod = lambda v: LineModel([v[0],pt1[1]], [v[1], pt2[1]], h=h, sig=sig)
+    data = mod(v_real)
 
     def cost(pars):
         print "called with pars", pars
         return (data - mod(pars)).ravel()
 
-    v_guess = [0.5, 0.5] # h, sig
+    v_guess = [0.5, 0.5] # x1, x2
     v, success = leastsq(cost, v_guess)
     model = mod(v)
-
-    """
-    pt1, pt2 = [0.2, 0.2], [0.8, 0.4]
-
-    # These are the parameters given by Hough
-    m = (pt2[1] - pt1[1]) / (pt2[0] - pt1[0])
-    b = 0.1
-
-    # The actual endpoints of the segment
-    v_real = [0.2, 0.8]
-
-    def mod(v):
-        x1, x2 = v[0], v[1]
-        y1 = m*x1 + b
-        y2 = m*x2 + b
-        return LineModel([x1, y1], [x2, y2], Nx=Nx, Ny=Ny, h=1.0, sig=0.025).flatten()
-
-    data = mod(v_real).flatten()
-
-    def cost(pars):
-        print "Called with Pars", pars
-        return abs(data - mod(pars)).sum()
-
-    v_guess = [0.50, 0.50]
-#     v,suc = leastsq(cost, v_guess)#, ftol=1e-8)
-    v, suc  = leastsq(cost, v_guess, ftol=1e-12, xtol=1e-12, maxfev=1000)
-    model = mod(v)
-    """
 
     fig = plt.figure()
     ax1 = fig.add_subplot('221')
     ax2 = fig.add_subplot('222')
     ax3 = fig.add_subplot('212')
 
-    ax1.imshow(data .T, origin= 'image', cmap=plt.cm.gray,interpolation='nearest')
-    ax2.imshow(model.T, origin='image', cmap=plt.cm.gray,interpolation='nearest')
     diff = data - model
 
-    ax3.imshow(diff .T, origin= 'image', cmap=plt.cm.gray,interpolation='nearest')
+    ax1.imshow(data.T,  origin='image', cmap=plt.cm.gray, interpolation='nearest')
+    ax2.imshow(model.T, origin='image', cmap=plt.cm.gray, interpolation='nearest')
+    ax3.imshow(diff.T,  origin='image', cmap=plt.cm.gray, interpolation='nearest')
 
     ax1.set_title('data')
     ax2.set_title('model')
     ax3.set_title('diff')
 
     plt.show()
+
 
 if __name__ == "__main__":
     FitLine_test2()
