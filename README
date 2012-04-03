@@ -1,3 +1,6 @@
 Introduction
 --------------------------------------------------------
-Module elmpy is intended for a project involving the elimination of astronomical trails left by 
+Module elmpy is a python based module intended for a project involving the elimination of astronomical trails left by 
+earth orbiting satellites. It is to scan based program that scans astronomical images, automatically detecting and
+filtering these trails. It does this by utilizing a variation of the hough transform and robust elimination.
+--------------------------------------------------------
