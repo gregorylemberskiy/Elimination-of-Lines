@@ -21,7 +21,7 @@ def main():
 
     plt.gray()
     ax1.imshow(A ,  origin='image', interpolation='nearest')
-    ax2.imshow(highpass(A),origin='image', interpolation='nearest')
+    ax2.imshow(Highpass(A),origin='image', interpolation='nearest')
     
     ax1.set_title('Original')
     ax2.set_title('Histeq')
