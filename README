@@ -12,5 +12,7 @@ python __init__.py
 To run other file: 
 python __init__.py --f "Other_File.fits.gz"
 
+THE CODE WILL TAKE UP TO 10 MINUTES TO RUN. 
+
 # Issues!
 The code has an issue with optimization over the 7 parameter Model {Offset, Angle, Sky, Thickness, Normalization, left endpoint, right endpoint}. However, the code does not have a problem optimizing over a simpler model as shown in endpoint_fit.py. The endpoint problem must be resolved in Optim.py before successfully eliminating astronomical trails. 
