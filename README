@@ -1,11 +1,13 @@
 # Introduction
 Module elmpy is a python based module intended for a project involving the elimination of astronomical trails left by earth orbiting satellites. The code is going to be able to scan astronomical images and automatically detect and filter these trails. It does this by utilizing a variation of the hough transform and robust elimination.
 
+# Running the Code
 Before running the code it is necessary to download sample images through the link below:
 https://github.com/downloads/gregorylemberskiy/Elimination-of-Lines/Sample_gz_Files.tar.gz
 
 It is necessary to provide a fits.gz file which will be scanned for astronomical trails. If a file is not provided, the program will search for the default fits.gz file "NGC_3521_UGC_6150-r.fits.gz", which can be found in the tar file. 
 To run default file:
 python __init__.py
+
 To run other file: 
 python __init__.py --f "Other_File.fits.gz"
