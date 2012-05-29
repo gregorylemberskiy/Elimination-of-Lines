@@ -1,9 +1,21 @@
 """
-* -----------------------------------------------------------------------------
-* MODULE: elmpy
-*
-* Author: Gregory Lemberskiy
-* -----------------------------------------------------------------------------
+MODULE: elmpy
+Eliminates astronomical trails from astronomical images
+Copyright (C) 2012  Gregory Lemberskiy
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 """
 from Readfits  import *
 from Highpass  import *
@@ -53,11 +65,11 @@ if __name__ == "__main__":
 	
 	plt.gray()
 
-	gl_imshow(image.T, ax=ax1, origin='image',vmin=vmin, vmax=vmax, 
+	gl_imshow(image, ax=ax1, origin='image',vmin=vmin, vmax=vmax, 
 		   interpolation='nearest')
-	gl_imshow(model.T, ax=ax2, origin='image',vmin=vmin, vmax=vmax, 
+	gl_imshow(model, ax=ax2, origin='image',vmin=vmin, vmax=vmax, 
 		   interpolation='nearest')
-	gl_imshow(diff .T, ax=ax3, origin='image',vmin=vmin, vmax=vmax, 
+	gl_imshow(diff , ax=ax3, origin='image',vmin=vmin, vmax=vmax, 
 		   interpolation='nearest')
 	
 	ax1.set_title('data')

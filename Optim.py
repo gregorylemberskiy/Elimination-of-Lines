@@ -1,3 +1,21 @@
+"""
+Optim.py is part of elmpy, a module that eliminates astronomical trails. 
+Copyright (C) 2012  Gregory Lemberskiy
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.ndimage import binary_closing, grey_closing
@@ -100,8 +118,9 @@ def Optim(pars, data):
         #print "called with pars", pars
         return ((data - Model(pars,info))**2).sum()
 
-    v = fmin(cost, pars, args = (data, info))
-    return v 
+    v = fmin(cost, pars, args = (data, info))    
+
+    return Model(v,info)
 
 def main():
     """
@@ -115,10 +134,9 @@ def main():
     data = LineModel(v_real)
     v_guess = [50., -30., 1.0, .005, 1.0, 0.5, 0.5]
     
-    info = GenerateInfo(data)
+#    info = GenerateInfo(data)
     
-    v = Optim(v_guess,data)
-    model = Model(v,info)
+    model = Optim(v_guess,data)
 
     fig = plt.figure()
     ax1 = fig.add_subplot('221')
