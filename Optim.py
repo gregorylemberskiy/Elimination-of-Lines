@@ -19,7 +19,7 @@ def LineModel(pars, Nx=100, Ny=100):
     may have different resolutions Nx, Ny.
 
     Parameters:
-    ----------------------------------------------------------------------------
+    -------------------------------------------------------------------------
 
     pt1, pt2 ... (x1, y1), (x2, y2) points through whigh the line passes
     Nx, Ny ... resolution in x and y direction
@@ -47,6 +47,46 @@ def LineModel(pars, Nx=100, Ny=100):
     A[y2 - (X-x2)/m < Y] = 0.0
     return A
 
+def GenerateInfo(image):
+    Nx, Ny = image.shape
+    xi = np.linspace(1, Nx, Nx)
+    yi = np.linspace(1, Ny, Ny)
+    xj = xi[:,np.newaxis]
+    yj = yi[np.newaxis,:]
+    X, Y = np.mgrid[0:1:Nx*1j,0:1:Ny*1j]        
+    X = X*Nx
+    Y = Y*Ny
+    info  = Nx, Ny, xj, yj, X, Y
+    return info
+
+def Model(pars, info):
+    """   
+    Returns: model image of line. Generates image using 7 parameters:
+    offset, angle, thickness, normalization, sky, and left/right endpoints 
+    along x coordinate. The line is a gaussian with given thickness
+    normalization. 
+    """
+    Offset, Angle, sky, sig, Norm, x1, x2 = pars
+    Nx, Ny, xj, yj, X, Y = info
+    m = -np.tan(np.deg2rad(Angle))
+    b = Offset/np.cos(np.deg2rad(Angle))+0.5*Ny-.5*Nx*m
+    xp = (xj + m*(yj - b)) / (m**2 + 1)
+    yp = m*xp + b
+    
+    x1 = Nx*x1
+    x2 = Nx*x2
+    y1 = m*x1+b
+    y2 = m*x2+b
+
+    r  = np.sqrt((yp - yj)**2 + (xp - xj)**2)
+
+    gs = Norm * np.exp(-0.5 * r**2 / sig**2)
+    gs[y1 - (X - x1)/abs(m) > Y]  = 0.0 
+    gs[y2 - (X - x2)/abs(m) < Y]  = 0.0
+    gs += sky
+    return gs
+
+
 def Optim(pars, data):
     """
     Tests a line-model fit with endpoints using the scipy.fmin. Optimizes over
@@ -54,11 +94,13 @@ def Optim(pars, data):
     """
     from scipy.optimize import leastsq, fmin
 
-    def cost(pars):
-        print "called with pars", pars
-        return ((data - LineModel(pars))**2).sum()
+    info = GenerateInfo(data)
 
-    v = fmin(cost, pars)
+    def cost(pars, data, info):
+        #print "called with pars", pars
+        return ((data - Model(pars,info))**2).sum()
+
+    v = fmin(cost, pars, args = (data, info))
     return v 
 
 def main():
@@ -71,11 +113,12 @@ def main():
     v_real = [50., -30., 1.0, .005, 1.0, 0.2, 0.8]
 
     data = LineModel(v_real)
-
     v_guess = [50., -30., 1.0, .005, 1.0, 0.5, 0.5]
     
+    info = GenerateInfo(data)
+    
     v = Optim(v_guess,data)
-    model = LineModel(v)
+    model = Model(v,info)
 
     fig = plt.figure()
     ax1 = fig.add_subplot('221')
